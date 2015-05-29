@@ -13,7 +13,11 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import inria.pongv2.R;
+import inria.pongv2.models.GyroscopeCoordinates;
 import inria.pongv2.models.Player;
 import inria.pongv2.services.DownloadResultReceiver;
 import inria.pongv2.services.DownloadService;
@@ -21,10 +25,13 @@ import inria.pongv2.services.DownloadService;
 
 public class MainActivity extends Activity implements SensorEventListener, DownloadResultReceiver.Receiver {
 
+    public static final String RECEIVER = "RECEIVER";
+    public static final String GYRO_DATA = "GYRO_DATA";
+
     private TextView tv;
     private SensorManager sManager;
     private DownloadResultReceiver mReceiver;
-    private Intent intent;
+    private Intent mIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +41,9 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
         /* Starting Download Service */
         mReceiver = new DownloadResultReceiver(new Handler());
         mReceiver.setReceiver(this);
-        intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadService.class);
-        intent.putExtra("receiver", mReceiver);
+
+        mIntent = new Intent(Intent.ACTION_SYNC, null, this, DownloadService.class);
+        mIntent.putExtra(RECEIVER, mReceiver);
 
         tv = (TextView) findViewById(R.id.textView3);
         //get a hook to the sensor service
@@ -94,7 +102,8 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
                 setProgressBarIndeterminateVisibility(false);
 
                 Player player = resultData.getParcelable("player");
-                tv.append("\n" + player.getUsername());
+                GyroscopeCoordinates gyroscopeCoordinates = player.getGyroscopeCoordinates();
+                tv.setText(gyroscopeCoordinates.toString());
 
                 break;
             case DownloadService.STATUS_ERROR:
@@ -110,7 +119,10 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
         if (sensorEvent.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
             return;
         }
-        startService(intent);
+
+        mIntent.putExtra(GYRO_DATA, sensorEvent.values);
+
+        startService(mIntent);
     }
 
     @Override

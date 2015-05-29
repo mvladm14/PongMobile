@@ -5,71 +5,86 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
-import com.fluentinterface.ReflectionBuilder;
-import com.fluentinterface.builder.Builder;
-
 public class GyroscopeCoordinates implements Parcelable {
 
-	private double x;
-	private double y;
-	private double z;
-	
-	public static GryoscopeCoordinatesBuilder create() {
-		return ReflectionBuilder.implementationFor(GryoscopeCoordinatesBuilder.class).create();
-	}
+    private double x;
+    private double y;
+    private double z;
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
+    public GyroscopeCoordinates(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
-	@Override
-	public void writeToParcel(Parcel parcel, int i) {
-		parcel.writeDouble(x);
-		parcel.writeDouble(y);
-		parcel.writeDouble(z);
-	}
+    public static final Parcelable.Creator<GyroscopeCoordinates> CREATOR
+            = new Parcelable.Creator<GyroscopeCoordinates>() {
+        public GyroscopeCoordinates createFromParcel(Parcel in) {
+            return new GyroscopeCoordinates(in);
+        }
 
-	public interface GryoscopeCoordinatesBuilder extends Builder<GyroscopeCoordinates> {
-		public GryoscopeCoordinatesBuilder withX(double x);
-		public GryoscopeCoordinatesBuilder withY(double y);
-		public GryoscopeCoordinatesBuilder withZ(double z);
-	}
+        public GyroscopeCoordinates[] newArray(int size) {
+            return new GyroscopeCoordinates[size];
+        }
+    };
 
-	public double getX() {
-		return x;
-	}
+    private GyroscopeCoordinates(Parcel in) {
+        x = in.readLong();
+        y = in.readLong();
+        z = in.readLong();
+    }
 
-	public double getY() {
-		return y;
-	}
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-	public double getZ() {
-		return z;
-	}
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeDouble(x);
+        parcel.writeDouble(y);
+        parcel.writeDouble(z);
+    }
 
-	public void setX(double x) {
-		this.x = x;
-	}
+    public double getX() {
+        return x;
+    }
 
-	public void setY(double y) {
-		this.y = y;
-	}
+    public double getY() {
+        return y;
+    }
 
-	public void setZ(double z) {
-		this.z = z;
-	}
+    public double getZ() {
+        return z;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(getX(), getY(), getZ());
-	}
+    public void setX(double x) {
+        this.x = x;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof GyroscopeCoordinates)
-				&& Objects.equals(getX(), ((GyroscopeCoordinates) obj).getX())
-				&& Objects.equals(getY(), ((GyroscopeCoordinates) obj).getY())
-				&& Objects.equals(getZ(), ((GyroscopeCoordinates) obj).getZ());
-	}
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY(), getZ());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof GyroscopeCoordinates)
+                && Objects.equals(getX(), ((GyroscopeCoordinates) obj).getX())
+                && Objects.equals(getY(), ((GyroscopeCoordinates) obj).getY())
+                && Objects.equals(getZ(), ((GyroscopeCoordinates) obj).getZ());
+    }
+
+    @Override
+    public String toString() {
+        return "x: " + x + " y: " + y + " z: " + z;
+    }
 }

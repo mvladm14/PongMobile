@@ -24,6 +24,9 @@
             android:name=".services.DownloadService"
             android:exported="false" />
 
+        android:debuggable="true"
+
+
     </application>
 
 </manifest>

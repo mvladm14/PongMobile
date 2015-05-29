@@ -5,30 +5,23 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
-import com.fluentinterface.ReflectionBuilder;
-import com.fluentinterface.builder.Builder;
-
 public class Player implements Parcelable {
 
-	private long id;
-	private String username;
-	private GyroscopeCoordinates gyroscopeCoordinates;
+    private long id;
+    private String username;
+    private GyroscopeCoordinates gyroscopeCoordinates;
 
-	public static PlayerBuilder create() {
-		return ReflectionBuilder.implementationFor(PlayerBuilder.class)
-				.create();
-	}
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel parcel, int i) {
-		parcel.writeLong(id);
-		parcel.writeString(username);
-	}
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(username);
+        parcel.writeParcelable(gyroscopeCoordinates, i);
+    }
 
 
     public static final Parcelable.Creator<Player> CREATOR
@@ -43,56 +36,46 @@ public class Player implements Parcelable {
     };
 
     private Player(Parcel in) {
+        gyroscopeCoordinates = in.readParcelable(GyroscopeCoordinates.class.getClassLoader());
         id = in.readLong();
         username = in.readString();
     }
 
+    public GyroscopeCoordinates getGyroscopeCoordinates() {
+        return gyroscopeCoordinates;
+    }
 
+    public void setGyroscopeCoordinates(
+            GyroscopeCoordinates gyroscopeCoordinates) {
+        this.gyroscopeCoordinates = gyroscopeCoordinates;
+    }
 
-    public interface PlayerBuilder extends Builder<Player> {
-		public PlayerBuilder withUsername(String username);
+    public long getId() {
+        return id;
+    }
 
-		public PlayerBuilder withGyroscopeCoordinates(
-				GyroscopeCoordinates gyroscopeCoordinates);
-		
-		public PlayerBuilder withId(long id);
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public GyroscopeCoordinates getGyroscopeCoordinates() {
-		return gyroscopeCoordinates;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setGyroscopeCoordinates(
-			GyroscopeCoordinates gyroscopeCoordinates) {
-		this.gyroscopeCoordinates = gyroscopeCoordinates;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public long getId() {
-		return id;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername(), getGyroscopeCoordinates());
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(getUsername(), getGyroscopeCoordinates());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof GyroscopeCoordinates)
-				&& Objects.equals(getUsername(), ((Player) obj).getUsername())
-				&& Objects.equals(getGyroscopeCoordinates(),
-						((Player) obj).getGyroscopeCoordinates());
-	}
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof GyroscopeCoordinates)
+                && Objects.equals(getUsername(), ((Player) obj).getUsername())
+                && Objects.equals(getGyroscopeCoordinates(),
+                ((Player) obj).getGyroscopeCoordinates());
+    }
 }

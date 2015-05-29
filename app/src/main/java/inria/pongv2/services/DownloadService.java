@@ -9,8 +9,11 @@ import android.util.Log;
 
 import java.util.Collection;
 
+import inria.pongv2.activities.MainActivity;
 import inria.pongv2.interfaces.PongSvcApi;
+import inria.pongv2.models.GyroscopeCoordinates;
 import inria.pongv2.models.Player;
+import inria.pongv2.utils.Converter;
 import retrofit.RestAdapter;
 
 /**
@@ -39,12 +42,17 @@ public class DownloadService extends IntentService {
 
         Log.d(TAG, "Service Started!");
 
-        final ResultReceiver receiver = intent.getParcelableExtra("receiver");
+        final ResultReceiver receiver = intent.getParcelableExtra(MainActivity.RECEIVER);
+
+        final float[] gyroCoords = intent.getFloatArrayExtra(MainActivity.GYRO_DATA);
 
         Bundle bundle = new Bundle();
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
         try {
+
+            uploadGyroscopeValues(Converter.convertFloatsToDoubles(gyroCoords));
+
             Player player = downloadData();
 
                 /* Sending result back to activity */
@@ -60,6 +68,17 @@ public class DownloadService extends IntentService {
         }
         Log.d(TAG, "Service Stopping!");
         this.stopSelf();
+    }
+
+    private void uploadGyroscopeValues(double[] gyroCoords) {
+
+        double roolX = gyroCoords[0];
+        double pitchY = gyroCoords[1];
+        double yawZ = gyroCoords[2];
+
+        GyroscopeCoordinates gyroscopeCoordinates = new GyroscopeCoordinates(roolX, pitchY, yawZ);
+
+        pongSvc.setGyroscopeCoordinates(1, gyroscopeCoordinates);
     }
 
     private Player downloadData() {
