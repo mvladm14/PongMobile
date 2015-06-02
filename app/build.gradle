@@ -1,3 +1,7 @@
+configurations {
+    all*.exclude group: 'com.android.support', module: 'support-v4'
+}
+
 apply plugin: 'com.android.application'
 
 android {
@@ -20,6 +24,12 @@ android {
             debuggable true
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -27,7 +37,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.+'
-    compile("com.squareup.retrofit:retrofit:1.9.0")
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile files('libs/PongCommon.jar')
+    compile 'com.github.davidmarquis:fluent-interface-proxy:1.3.0'
 }

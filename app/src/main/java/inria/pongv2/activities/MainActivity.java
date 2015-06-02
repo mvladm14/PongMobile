@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import inria.pongv2.R;
-import inria.pongv2.models.GyroscopeCoordinates;
-import inria.pongv2.models.Player;
+import inria.pongv2.models.ParcelableCoordinates;
+import inria.pongv2.models.ParcelableGyroCoords;
+import inria.pongv2.models.ParcelablePlayer;
 import inria.pongv2.services.DownloadResultReceiver;
 import inria.pongv2.services.DownloadService;
+import models.GyroscopeCoordinates;
 
 
 public class MainActivity extends Activity implements SensorEventListener, DownloadResultReceiver.Receiver {
@@ -101,9 +103,8 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
                 /* Hide progress & extract result from bundle */
                 setProgressBarIndeterminateVisibility(false);
 
-                Player player = resultData.getParcelable("player");
-                GyroscopeCoordinates gyroscopeCoordinates = player.getGyroscopeCoordinates();
-                tv.setText(gyroscopeCoordinates.toString());
+                ParcelableCoordinates coordinates = resultData.getParcelable("coordinates");
+                tv.setText(coordinates.toString());
 
                 break;
             case DownloadService.STATUS_ERROR:

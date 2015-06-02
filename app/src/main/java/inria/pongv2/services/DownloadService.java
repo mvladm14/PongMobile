@@ -7,25 +7,16 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import java.util.Collection;
-
 import inria.pongv2.activities.MainActivity;
-import inria.pongv2.interfaces.PongSvcApi;
-import inria.pongv2.models.GyroscopeCoordinates;
-import inria.pongv2.models.Player;
+import inria.pongv2.models.ParcelableCoordinates;
 import inria.pongv2.utils.Converter;
-import retrofit.RestAdapter;
+import inria.pongv2.utils.Downloader;
+import models.Coordinates;
 
 /**
  * Created by Vlad on 5/28/2015.
  */
 public class DownloadService extends IntentService {
-
-    private static final String SERVER = "http://131.254.101.102:8080/Pong";
-
-    private PongSvcApi pongSvc = new RestAdapter.Builder().setEndpoint(SERVER)
-            .build().create(PongSvcApi.class);
-
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 1;
@@ -51,13 +42,14 @@ public class DownloadService extends IntentService {
 
         try {
 
-            uploadGyroscopeValues(Converter.convertFloatsToDoubles(gyroCoords));
+            Downloader.uploadGyroscopeValues(Converter.convertFloatsToDoubles(gyroCoords));
 
-            Player player = downloadData();
+            Coordinates coordinates = Downloader.downloadCoordinates();
+            ParcelableCoordinates parcelableCoordinates = Converter.convertCoordinatesToParcelable(coordinates);
 
                 /* Sending result back to activity */
-            if (null != player) {
-                bundle.putParcelable("player", player);
+            if (null != coordinates) {
+                bundle.putParcelable("coordinates", parcelableCoordinates);
                 receiver.send(STATUS_FINISHED, bundle);
             }
         } catch (Exception e) {
@@ -70,20 +62,5 @@ public class DownloadService extends IntentService {
         this.stopSelf();
     }
 
-    private void uploadGyroscopeValues(double[] gyroCoords) {
 
-        double roolX = gyroCoords[0];
-        double pitchY = gyroCoords[1];
-        double yawZ = gyroCoords[2];
-
-        GyroscopeCoordinates gyroscopeCoordinates = new GyroscopeCoordinates(roolX, pitchY, yawZ);
-
-        pongSvc.setGyroscopeCoordinates(1, gyroscopeCoordinates);
-    }
-
-    private Player downloadData() {
-
-        Collection<Player> players = pongSvc.getPlayersList();
-        return players.iterator().next();
-    }
 }
