@@ -8,10 +8,10 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import inria.pongv2.activities.MainActivity;
-import inria.pongv2.models.ParcelableCoordinates;
+import inria.pongv2.models.ParcelableBallCoordinates;
 import inria.pongv2.utils.Converter;
 import inria.pongv2.utils.Downloader;
-import models.Coordinates;
+import models.BallCoordinates;
 
 /**
  * Created by Vlad on 5/28/2015.
@@ -35,21 +35,21 @@ public class DownloadService extends IntentService {
 
         final ResultReceiver receiver = intent.getParcelableExtra(MainActivity.RECEIVER);
 
-        final float[] gyroCoords = intent.getFloatArrayExtra(MainActivity.GYRO_DATA);
+        final float[] phoneCoords = intent.getFloatArrayExtra(MainActivity.PHONE_COORDS);
 
         Bundle bundle = new Bundle();
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
         try {
 
-            Downloader.uploadGyroscopeValues(Converter.convertFloatsToDoubles(gyroCoords));
+            Downloader.uploadPhoneCoordinates(Converter.convertFloatsToDoubles(phoneCoords));
 
-            Coordinates coordinates = Downloader.downloadCoordinates();
-            ParcelableCoordinates parcelableCoordinates = Converter.convertCoordinatesToParcelable(coordinates);
+            BallCoordinates ballCoordinates = Downloader.downloadCoordinates();
+            ParcelableBallCoordinates parcelableBallCoordinates = Converter.convertCoordinatesToParcelable(ballCoordinates);
 
                 /* Sending result back to activity */
-            if (null != coordinates) {
-                bundle.putParcelable("coordinates", parcelableCoordinates);
+            if (null != ballCoordinates) {
+                bundle.putParcelable(MainActivity.BALL_COORDS, parcelableBallCoordinates);
                 receiver.send(STATUS_FINISHED, bundle);
             }
         } catch (Exception e) {

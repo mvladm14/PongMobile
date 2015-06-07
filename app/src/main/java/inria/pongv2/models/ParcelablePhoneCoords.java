@@ -3,16 +3,17 @@ package inria.pongv2.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import models.Coordinates;
+import models.PhoneCoordinates;
 
 /**
  * Created by Vlad on 6/2/2015.
  */
-public class ParcelableCoordinates extends Coordinates implements Parcelable {
+public class ParcelablePhoneCoords extends PhoneCoordinates implements Parcelable {
 
-    public ParcelableCoordinates(int x, int y) {
+    public ParcelablePhoneCoords(double x, double y, double z) {
         this.setX(x);
         this.setY(y);
+        this.setZ(z);
     }
 
     @Override
@@ -22,7 +23,8 @@ public class ParcelableCoordinates extends Coordinates implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(getX());
-        parcel.writeInt(getY());
+        parcel.writeDouble(getX());
+        parcel.writeDouble(getY());
+        parcel.writeDouble(getZ());
     }
 }

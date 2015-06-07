@@ -3,17 +3,17 @@ package inria.pongv2.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import models.GyroscopeCoordinates;
+import models.BallCoordinates;
+
 
 /**
  * Created by Vlad on 6/2/2015.
  */
-public class ParcelableGyroCoords extends GyroscopeCoordinates implements Parcelable {
+public class ParcelableBallCoordinates extends BallCoordinates implements Parcelable {
 
-    public ParcelableGyroCoords(double x, double y, double z) {
+    public ParcelableBallCoordinates(int x, int y) {
         this.setX(x);
         this.setY(y);
-        this.setZ(z);
     }
 
     @Override
@@ -23,8 +23,7 @@ public class ParcelableGyroCoords extends GyroscopeCoordinates implements Parcel
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeDouble(getX());
-        parcel.writeDouble(getY());
-        parcel.writeDouble(getZ());
+        parcel.writeInt(getX());
+        parcel.writeInt(getY());
     }
 }

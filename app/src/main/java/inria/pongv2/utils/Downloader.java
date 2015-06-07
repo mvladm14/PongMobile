@@ -2,8 +2,8 @@ package inria.pongv2.utils;
 
 import java.util.Collection;
 
-import inria.pongv2.models.ParcelableGyroCoords;
-import models.Coordinates;
+import inria.pongv2.models.ParcelablePhoneCoords;
+import models.BallCoordinates;
 import models.Player;
 import restInterfaces.PlayerSvcApi;
 import restInterfaces.PongBallSvcApi;
@@ -28,18 +28,18 @@ public class Downloader {
         return players.iterator().next();
     }
 
-    public static Coordinates downloadCoordinates() {
+    public static BallCoordinates downloadCoordinates() {
         return ballSvcApi.getCoordinates(1);
     }
 
-    public static void uploadGyroscopeValues(double[] gyroCoords) {
+    public static void uploadPhoneCoordinates(double[] phoneCoords) {
 
-        double roolX = gyroCoords[0];
-        double pitchY = gyroCoords[1];
-        double yawZ = gyroCoords[2];
+        double roolX = phoneCoords[0];
+        double pitchY = phoneCoords[1];
+        double yawZ = phoneCoords[2];
 
-        ParcelableGyroCoords gyroscopeCoordinates = new ParcelableGyroCoords(roolX, pitchY, yawZ);
+        ParcelablePhoneCoords phoneCoordinates = new ParcelablePhoneCoords(roolX, pitchY, yawZ);
 
-        playerSvcApi.setGyroscopeCoordinates(1, gyroscopeCoordinates);
+        playerSvcApi.setPhoneCoordinates(1, phoneCoordinates);
     }
 }

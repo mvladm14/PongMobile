@@ -1,10 +1,10 @@
 package inria.pongv2.utils;
 
-import inria.pongv2.models.ParcelableCoordinates;
-import inria.pongv2.models.ParcelableGyroCoords;
+import inria.pongv2.models.ParcelableBallCoordinates;
+import inria.pongv2.models.ParcelablePhoneCoords;
 import inria.pongv2.models.ParcelablePlayer;
-import models.Coordinates;
-import models.GyroscopeCoordinates;
+import models.BallCoordinates;
+import models.PhoneCoordinates;
 import models.Player;
 
 /**
@@ -25,16 +25,16 @@ public class Converter {
 
     public static ParcelablePlayer convertPlayerToParcelablePlayer(Player player) {
 
-        ParcelableGyroCoords coords = convertGyroCoordsToParcelableGyroCoords(player.getGyroscopeCoordinates());
+        ParcelablePhoneCoords coords = convertGyroCoordsToParcelableGyroCoords(player.getPhoneCoordinates());
 
         return new ParcelablePlayer(player.getId(), player.getUsername(), coords);
     }
 
-    public static ParcelableGyroCoords convertGyroCoordsToParcelableGyroCoords(GyroscopeCoordinates gyroscopeCoordinates) {
-        return new ParcelableGyroCoords(gyroscopeCoordinates.getX(), gyroscopeCoordinates.getY(), gyroscopeCoordinates.getZ());
+    public static ParcelablePhoneCoords convertGyroCoordsToParcelableGyroCoords(PhoneCoordinates phoneCoordinates) {
+        return new ParcelablePhoneCoords(phoneCoordinates.getX(), phoneCoordinates.getY(), phoneCoordinates.getZ());
     }
 
-    public static ParcelableCoordinates convertCoordinatesToParcelable(Coordinates coordinates) {
-        return new ParcelableCoordinates(coordinates.getX(),coordinates.getY());
+    public static ParcelableBallCoordinates convertCoordinatesToParcelable(BallCoordinates ballCoordinates) {
+        return new ParcelableBallCoordinates(ballCoordinates.getX(), ballCoordinates.getY());
     }
 }

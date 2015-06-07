@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import inria.pongv2.utils.Converter;
-import models.GyroscopeCoordinates;
+import models.PhoneCoordinates;
 import models.Player;
 
 /**
@@ -12,10 +12,10 @@ import models.Player;
  */
 public class ParcelablePlayer extends Player implements Parcelable {
 
-    public ParcelablePlayer(long id, String username, GyroscopeCoordinates gyroscopeCoordinates) {
+    public ParcelablePlayer(long id, String username, PhoneCoordinates phoneCoordinates) {
         this.setId(id);
         this.setUsername(username);
-        this.setGyroscopeCoordinates(gyroscopeCoordinates);
+        this.setPhoneCoordinates(phoneCoordinates);
     }
 
     @Override
@@ -27,6 +27,6 @@ public class ParcelablePlayer extends Player implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(getId());
         parcel.writeString(getUsername());
-        parcel.writeParcelable(Converter.convertGyroCoordsToParcelableGyroCoords(getGyroscopeCoordinates()), i);
+        parcel.writeParcelable(Converter.convertGyroCoordsToParcelableGyroCoords(getPhoneCoordinates()), i);
     }
 }
