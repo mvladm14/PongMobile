@@ -1,10 +1,8 @@
 package inria.pongv2.utils;
 
-import java.util.Collection;
-
-import inria.pongv2.models.ParcelablePhoneCoords;
-import models.BallCoordinates;
-import models.Player;
+import models.ball.BallCoordinates;
+import models.phone.Accelerometer;
+import models.phone.MagneticField;
 import restInterfaces.PlayerSvcApi;
 import restInterfaces.PongBallSvcApi;
 import retrofit.RestAdapter;
@@ -14,7 +12,7 @@ import retrofit.RestAdapter;
  */
 public class Downloader {
 
-    private static final String SERVER = "http://131.254.101.102:8080/PongServerSide";
+    private static final String SERVER = "http://131.254.101.102:8080/myriads";
 
     private static PlayerSvcApi playerSvcApi = new RestAdapter.Builder().setEndpoint(SERVER)
             .build().create(PlayerSvcApi.class);
@@ -22,24 +20,23 @@ public class Downloader {
     private static PongBallSvcApi ballSvcApi = new RestAdapter.Builder().setEndpoint(SERVER)
             .build().create(PongBallSvcApi.class);
 
-    public static Player downloadData() {
-
-        Collection<Player> players = playerSvcApi.getPlayersList();
-        return players.iterator().next();
-    }
-
-    public static BallCoordinates downloadCoordinates() {
+    public static BallCoordinates downloadBallCoordinates() {
         return ballSvcApi.getCoordinates(1);
     }
 
-    public static void uploadPhoneCoordinates(double[] phoneCoords) {
+    public static void uploadAcceleroemeterValues(float[] accelerometer) {
+        Accelerometer acc = new Accelerometer();
+        acc.setValues(accelerometer);
+        playerSvcApi.setAccelerometer(1, acc);
+    }
 
-        double roolX = phoneCoords[0];
-        double pitchY = phoneCoords[1];
-        double yawZ = phoneCoords[2];
+    public static void uploadMagneticFieldValues(float[] magnetic) {
+        MagneticField magneticField = new MagneticField();
+        magneticField.setValues(magnetic);
+        playerSvcApi.setMagnetic(1, magneticField);
+    }
 
-        ParcelablePhoneCoords phoneCoordinates = new ParcelablePhoneCoords(roolX, pitchY, yawZ);
-
-        playerSvcApi.setPhoneCoordinates(1, phoneCoordinates);
+    public static void uploadTimeStamp(long sensorTimeStamp) {
+        playerSvcApi.setTimeStamp(1, sensorTimeStamp);
     }
 }

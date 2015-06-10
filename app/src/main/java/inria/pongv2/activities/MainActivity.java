@@ -23,6 +23,10 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
 
     public static final String RECEIVER = "RECEIVER";
     public static final String PHONE_COORDS = "PHONE_COORDS";
+    public static final String ACCELEROMETER = "ACCELEROMETER";
+    public static final String MAGNETIC_FIELD = "MAGNETIC_FIELD";
+    public static final String TIMESTAMP = "TIMESTAMP";
+
     public static final String BALL_COORDS = "BALL COORDS";
 
     private TextView tv;
@@ -31,6 +35,7 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
     private Intent mIntent;
     private float[] mGravity;
     private float[] mGeomagnetic;
+    private long sensorTimeStamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +85,8 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
         callbacks defined in this class, and gather the sensor information as quick
         as possible*/
         sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_UI);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),SensorManager.SENSOR_DELAY_UI);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     //When this Activity isn't visible anymore
@@ -124,59 +129,34 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
             mGeomagnetic = event.values;
         }
         if (mGravity != null && mGeomagnetic != null) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
-            if (success) {
-                float orientation[] = new float[3];
-                SensorManager.getOrientation(R, orientation);
-                // at this point, orientation contains the azimut,
-                // pitch and roll values.
 
-                //Convert to degrees
-                for (int i=0; i < orientation.length; i++) {
-                    Double degrees = (orientation[i] * 180) / Math.PI;
-                    orientation[i] = degrees.floatValue();
-                }
+            sensorTimeStamp = event.timestamp;
 
-                mIntent.putExtra(PHONE_COORDS, orientation);
+            mIntent.putExtra(ACCELEROMETER, mGravity);
+            mIntent.putExtra(MAGNETIC_FIELD, mGeomagnetic);
+            mIntent.putExtra(TIMESTAMP, sensorTimeStamp);
 
-                startService(mIntent);
+            startService(mIntent);
 
+            tv2.setText("x = " + mGravity[0] + "\n" +
+                    "y = " + mGravity[1] + "\n" +
+                    "z = " + mGravity[2] + "\n");
                 /*
-                //Convert to degrees
-                for (int i=0; i < orientation.length; i++) {
-                    Double degrees = (orientation[i] * 180) / Math.PI;
-                    orientation[i] = degrees.floatValue();
-                */
                 tv2.setText("azimut = " + String.format("%.6f",orientation[0]) +
                         "\npitch = " + String.format("%.6f",orientation[1]) +
                         "\nroll = " + String.format("%.6f",orientation[2]));
-
-
-            }
+                */
         }
     }
 
-    /*
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            if (sensorEvent.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
-                return;
-            }
-
-            tv2.setText("x = " + String.format("%.3f",sensorEvent.values[0]) +
-                        "\ny= " + String.format("%.3f",sensorEvent.values[1]) +
-                        "\nz= " + String.format("%.3f",sensorEvent.values[2]));
-
-
-            mIntent.putExtra(PHONE_COORDS, sensorEvent.values);
-
-            //startService(mIntent);
-        }
-    */
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(mIntent);
     }
 }

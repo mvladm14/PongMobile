@@ -3,7 +3,7 @@ package inria.pongv2.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import models.BallCoordinates;
+import models.ball.BallCoordinates;
 
 
 /**

@@ -11,7 +11,7 @@ import inria.pongv2.activities.MainActivity;
 import inria.pongv2.models.ParcelableBallCoordinates;
 import inria.pongv2.utils.Converter;
 import inria.pongv2.utils.Downloader;
-import models.BallCoordinates;
+import models.ball.BallCoordinates;
 
 /**
  * Created by Vlad on 5/28/2015.
@@ -35,16 +35,22 @@ public class DownloadService extends IntentService {
 
         final ResultReceiver receiver = intent.getParcelableExtra(MainActivity.RECEIVER);
 
-        final float[] phoneCoords = intent.getFloatArrayExtra(MainActivity.PHONE_COORDS);
+        final float[] accelerometer = intent.getFloatArrayExtra(MainActivity.ACCELEROMETER);
+        final float[] magnetic = intent.getFloatArrayExtra(MainActivity.MAGNETIC_FIELD);
+        long sensorTimeStamp = intent.getLongExtra(MainActivity.TIMESTAMP, 0);
 
         Bundle bundle = new Bundle();
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
         try {
 
-            Downloader.uploadPhoneCoordinates(Converter.convertFloatsToDoubles(phoneCoords));
+            Downloader.uploadAcceleroemeterValues(accelerometer);
+            Downloader.uploadMagneticFieldValues(magnetic);
+            Downloader.uploadTimeStamp(sensorTimeStamp);
 
-            BallCoordinates ballCoordinates = Downloader.downloadCoordinates();
+            //Downloader.uploadPhoneCoordinates(Converter.convertFloatsToDoubles(accelerometer));
+
+            BallCoordinates ballCoordinates = Downloader.downloadBallCoordinates();
             ParcelableBallCoordinates parcelableBallCoordinates = Converter.convertCoordinatesToParcelable(ballCoordinates);
 
                 /* Sending result back to activity */
@@ -61,6 +67,4 @@ public class DownloadService extends IntentService {
         Log.d(TAG, "Service Stopping!");
         this.stopSelf();
     }
-
-
 }
