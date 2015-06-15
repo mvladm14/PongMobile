@@ -2,6 +2,8 @@ package inria.pongv2.utils;
 
 import models.ball.BallCoordinates;
 import models.phone.Accelerometer;
+import models.phone.Gravity;
+import models.phone.LinearAcceleration;
 import models.phone.MagneticField;
 import restInterfaces.PlayerSvcApi;
 import restInterfaces.PongBallSvcApi;
@@ -38,5 +40,18 @@ public class Downloader {
 
     public static void uploadTimeStamp(long sensorTimeStamp) {
         playerSvcApi.setTimeStamp(1, sensorTimeStamp);
+    }
+
+    public static void uploadGravityValues(float[] gravity) {
+        Gravity gr = new Gravity();
+        gr.setValues(gravity);
+        playerSvcApi.setGravity(1, gr);
+    }
+
+    public static void uploadLinearAcceleration(float[] linear_acceleration) {
+        LinearAcceleration linearAcceleration = new LinearAcceleration();
+        linearAcceleration.setValues(linear_acceleration);
+        playerSvcApi.setLinearAcceleration(1, linearAcceleration);
+
     }
 }

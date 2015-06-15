@@ -35,9 +35,14 @@ public class DownloadService extends IntentService {
 
         final ResultReceiver receiver = intent.getParcelableExtra(MainActivity.RECEIVER);
 
+
         final float[] accelerometer = intent.getFloatArrayExtra(MainActivity.ACCELEROMETER);
+        final float[] gravity = intent.getFloatArrayExtra(MainActivity.GRAVITY);
         final float[] magnetic = intent.getFloatArrayExtra(MainActivity.MAGNETIC_FIELD);
+
+
         long sensorTimeStamp = intent.getLongExtra(MainActivity.TIMESTAMP, 0);
+        final float[] linear_acceleration = intent.getFloatArrayExtra(MainActivity.LINEAR_ACCELERATION);
 
         Bundle bundle = new Bundle();
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
@@ -46,7 +51,11 @@ public class DownloadService extends IntentService {
 
             Downloader.uploadAcceleroemeterValues(accelerometer);
             Downloader.uploadMagneticFieldValues(magnetic);
+            Downloader.uploadGravityValues(gravity);
+
             Downloader.uploadTimeStamp(sensorTimeStamp);
+            Downloader.uploadLinearAcceleration(linear_acceleration);
+
 
             //Downloader.uploadPhoneCoordinates(Converter.convertFloatsToDoubles(accelerometer));
 

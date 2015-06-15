@@ -2,12 +2,14 @@ package inria.pongv2.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -22,27 +24,39 @@ import inria.pongv2.services.DownloadService;
 public class MainActivity extends Activity implements SensorEventListener, DownloadResultReceiver.Receiver {
 
     public static final String RECEIVER = "RECEIVER";
-    public static final String PHONE_COORDS = "PHONE_COORDS";
     public static final String ACCELEROMETER = "ACCELEROMETER";
     public static final String MAGNETIC_FIELD = "MAGNETIC_FIELD";
     public static final String TIMESTAMP = "TIMESTAMP";
+    public static final String GRAVITY = "GRAVITY";
+    public static final String LINEAR_ACCELERATION = "LINEAR_ACCELERATION";
 
     public static final String BALL_COORDS = "BALL COORDS";
 
     private TextView tv;
     private TextView tv2;
+    private TextView tv3;
     private SensorManager sManager;
     private Intent mIntent;
+
+    private float[] mAccelerometer;
     private float[] mGravity;
     private float[] mGeomagnetic;
+    private float[] mGyroscope;
+    private float[] mLinearAcceleration;
+
     private long sensorTimeStamp;
+
+    static final float NS2S = 1.0f / 1000000000.0f;
+    float lastValue = 0f;
+    private float[] last_values;
+    float last_timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        System.out.println("ok");
-        /* Starting Download Service */
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         DownloadResultReceiver mReceiver = new DownloadResultReceiver(new Handler());
         mReceiver.setReceiver(this);
 
@@ -51,6 +65,7 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
 
         tv = (TextView) findViewById(R.id.textView3);
         tv2 = (TextView) findViewById(R.id.textView4);
+        tv3 = (TextView) findViewById(R.id.textView5);
         //get a hook to the sensor service
         sManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
@@ -84,9 +99,15 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
         /*register the sensor listener to listen to the gyroscope sensor, use the
         callbacks defined in this class, and gather the sensor information as quick
         as possible*/
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+        /*
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
+
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_FASTEST);
+        */
         sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     //When this Activity isn't visible anymore
@@ -123,29 +144,64 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            mGravity = event.values;
+            mAccelerometer = event.values;
         }
+
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             mGeomagnetic = event.values;
         }
-        if (mGravity != null && mGeomagnetic != null) {
 
-            sensorTimeStamp = event.timestamp;
+        /*
+        if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
+            mGravity = event.values;
+        }
 
-            mIntent.putExtra(ACCELEROMETER, mGravity);
+        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            mGyroscope = event.values;
+        }
+        if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            mLinearAcceleration = event.values;
+        }
+        */
+        if (mAccelerometer != null && mGeomagnetic != null) {
+            //sensorTimeStamp = event.timestamp;
+
+            mIntent.putExtra(ACCELEROMETER, mAccelerometer);
             mIntent.putExtra(MAGNETIC_FIELD, mGeomagnetic);
+            /*
             mIntent.putExtra(TIMESTAMP, sensorTimeStamp);
+
+            mIntent.putExtra(LINEAR_ACCELERATION, mLinearAcceleration);
+            mIntent.putExtra(GRAVITY, mGravity);
+            */
 
             startService(mIntent);
 
-            tv2.setText("x = " + mGravity[0] + "\n" +
-                    "y = " + mGravity[1] + "\n" +
-                    "z = " + mGravity[2] + "\n");
-                /*
-                tv2.setText("azimut = " + String.format("%.6f",orientation[0]) +
-                        "\npitch = " + String.format("%.6f",orientation[1]) +
-                        "\nroll = " + String.format("%.6f",orientation[2]));
-                */
+
+            float R[] = new float[9];
+            float I[] = new float[9];
+
+            boolean success = SensorManager.getRotationMatrix(R, I,
+                    mAccelerometer, mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                convertToDegrees(orientation);
+                tv2.setText("orientation = :\n" +
+                        "x = " + orientation[0] + "\n" +
+                        "y = " + orientation[1] + "\n" +
+                        "z = " + orientation[2] + "\n");
+            } else {
+                Log.e("VLAD", "fraier");
+            }
+
+        }
+    }
+
+    private void convertToDegrees(float[] orientation) {
+        for (int i = 0; i < orientation.length; i++) {
+            Double degrees = (orientation[i] * 180) / Math.PI;
+            orientation[i] = degrees.floatValue();
         }
     }
 
