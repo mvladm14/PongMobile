@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import inria.pongv2.activities.MainActivity;
+import inria.pongv2.activities.PlayActivity;
 import inria.pongv2.models.ParcelableBallCoordinates;
 import inria.pongv2.utils.Converter;
 import inria.pongv2.utils.Downloader;
@@ -33,25 +33,25 @@ public class DownloadService extends IntentService {
 
         Log.d(TAG, "Service Started!");
 
-        final ResultReceiver receiver = intent.getParcelableExtra(MainActivity.RECEIVER);
+        final ResultReceiver receiver = intent.getParcelableExtra(PlayActivity.RECEIVER);
 
 
-        final float[] accelerometer = intent.getFloatArrayExtra(MainActivity.ACCELEROMETER);
-        final float[] gravity = intent.getFloatArrayExtra(MainActivity.GRAVITY);
-        final float[] magnetic = intent.getFloatArrayExtra(MainActivity.MAGNETIC_FIELD);
+        final float[] accelerometer = intent.getFloatArrayExtra(PlayActivity.ACCELEROMETER);
+        final float[] gravity = intent.getFloatArrayExtra(PlayActivity.GRAVITY);
+        final float[] magnetic = intent.getFloatArrayExtra(PlayActivity.MAGNETIC_FIELD);
 
 
-        long sensorTimeStamp = intent.getLongExtra(MainActivity.TIMESTAMP, 0);
-        final float[] linear_acceleration = intent.getFloatArrayExtra(MainActivity.LINEAR_ACCELERATION);
+        long sensorTimeStamp = intent.getLongExtra(PlayActivity.TIMESTAMP, 0);
+        final float[] linear_acceleration = intent.getFloatArrayExtra(PlayActivity.LINEAR_ACCELERATION);
 
         Bundle bundle = new Bundle();
         receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
         try {
 
-            Downloader.uploadAcceleroemeterValues(accelerometer);
-            Downloader.uploadMagneticFieldValues(magnetic);
-            Downloader.uploadGravityValues(gravity);
+            //Downloader.uploadAcceleroemeterValues(accelerometer);
+            //Downloader.uploadMagneticFieldValues(magnetic);
+            //Downloader.uploadGravityValues(gravity);
 
             Downloader.uploadTimeStamp(sensorTimeStamp);
             Downloader.uploadLinearAcceleration(linear_acceleration);
@@ -64,11 +64,10 @@ public class DownloadService extends IntentService {
 
                 /* Sending result back to activity */
             if (null != ballCoordinates) {
-                bundle.putParcelable(MainActivity.BALL_COORDS, parcelableBallCoordinates);
+                bundle.putParcelable(PlayActivity.BALL_COORDS, parcelableBallCoordinates);
                 receiver.send(STATUS_FINISHED, bundle);
             }
         } catch (Exception e) {
-
                 /* Sending error message back to activity */
             bundle.putString(Intent.EXTRA_TEXT, e.toString());
             receiver.send(STATUS_ERROR, bundle);

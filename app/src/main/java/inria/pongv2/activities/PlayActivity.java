@@ -9,7 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -21,7 +20,7 @@ import inria.pongv2.services.DownloadResultReceiver;
 import inria.pongv2.services.DownloadService;
 
 
-public class MainActivity extends Activity implements SensorEventListener, DownloadResultReceiver.Receiver {
+public class PlayActivity extends Activity implements SensorEventListener, DownloadResultReceiver.Receiver {
 
     public static final String RECEIVER = "RECEIVER";
     public static final String ACCELEROMETER = "ACCELEROMETER";
@@ -39,17 +38,8 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
     private Intent mIntent;
 
     private float[] mAccelerometer;
-    private float[] mGravity;
     private float[] mGeomagnetic;
-    private float[] mGyroscope;
     private float[] mLinearAcceleration;
-
-    private long sensorTimeStamp;
-
-    static final float NS2S = 1.0f / 1000000000.0f;
-    float lastValue = 0f;
-    private float[] last_values;
-    float last_timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,23 +86,15 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
     @Override
     protected void onResume() {
         super.onResume();
-        /*register the sensor listener to listen to the gyroscope sensor, use the
-        callbacks defined in this class, and gather the sensor information as quick
-        as possible*/
-        /*
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
 
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_GRAVITY), SensorManager.SENSOR_DELAY_FASTEST);
-        */
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+        sManager.registerListener(this, sManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
 
     }
 
     //When this Activity isn't visible anymore
     @Override
     protected void onStop() {
+
         //unregister the sensor listener
         sManager.unregisterListener(this);
         super.onStop();
@@ -143,37 +125,24 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            mAccelerometer = event.values;
+        if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            mLinearAcceleration = event.values;
+            long timestamp = event.timestamp;
+
+            mIntent.putExtra(LINEAR_ACCELERATION, mLinearAcceleration);
+            mIntent.putExtra(TIMESTAMP, timestamp);
+            startService(mIntent);
         }
 
+        /*
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             mGeomagnetic = event.values;
         }
 
-        /*
-        if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
-            mGravity = event.values;
-        }
-
-        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            mGyroscope = event.values;
-        }
-        if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
-            mLinearAcceleration = event.values;
-        }
-        */
         if (mAccelerometer != null && mGeomagnetic != null) {
-            //sensorTimeStamp = event.timestamp;
 
             mIntent.putExtra(ACCELEROMETER, mAccelerometer);
             mIntent.putExtra(MAGNETIC_FIELD, mGeomagnetic);
-            /*
-            mIntent.putExtra(TIMESTAMP, sensorTimeStamp);
-
-            mIntent.putExtra(LINEAR_ACCELERATION, mLinearAcceleration);
-            mIntent.putExtra(GRAVITY, mGravity);
-            */
 
             startService(mIntent);
 
@@ -196,6 +165,7 @@ public class MainActivity extends Activity implements SensorEventListener, Downl
             }
 
         }
+        */
     }
 
     private void convertToDegrees(float[] orientation) {
